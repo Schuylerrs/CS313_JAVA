@@ -1,0 +1,6 @@
+com\mycompany\helloworld\ShowComments.class
+com\mycompany\helloworld\HelloServlet.class
+com\mycompany\helloworld\FileToucher.class
+com\mycompany\helloworld\Comment.class
+com\mycompany\helloworld\AddComment.class
+com\mycompany\helloworld\CommentHandeler.class
