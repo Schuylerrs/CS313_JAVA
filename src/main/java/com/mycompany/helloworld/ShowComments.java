@@ -8,6 +8,7 @@ package com.mycompany.helloworld;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Schuyler
  */
-@WebServlet(name = "HelloServlet", urlPatterns = {"/HelloServlet"})
-public class HelloServlet extends HttpServlet {
+@WebServlet(name = "ShowComments", urlPatterns = {"/ShowComments"})
+public class ShowComments extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -31,11 +32,42 @@ public class HelloServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException 
+    {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            request.getRequestDispatcher("ShowComments.jsp").forward(request, response);
+        try (PrintWriter out = response.getWriter()) 
+        {
+            if (System.getProperty("saveFile") == null)
+            {
+                String dir = System.getenv("OPENSHIFT_DATA_DIR");
+                
+                if (dir == null)
+                {
+                    dir = getServletContext().getRealPath(System.getenv("file.separator"));
+                }
+                
+                System.setProperty("saveFile", dir + System.getenv("file.separator") + "comments");
+            }
+
+            String username = (String)request.getSession().getAttribute("username");
+            if(username == null)
+            {
+                String newname = (String)request.getParameter("username");
+                if (newname == null)
+                {
+                    request.getRequestDispatcher("Login.jsp").forward(request, response);
+                }
+                else
+                {
+                    request.getSession().setAttribute("username", newname);
+                }
+            }
+
+            List<Comment> myList = CommentHandeler.getComments();
+
+            request.getSession().setAttribute("comments", myList);
+            request.setAttribute("comments", myList);
+            request.getRequestDispatcher("CommentList.jsp").forward(request, response);
         }
     }
 

@@ -8,6 +8,9 @@ package com.mycompany.helloworld;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,8 +21,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Schuyler
  */
-@WebServlet(name = "HelloServlet", urlPatterns = {"/HelloServlet"})
-public class HelloServlet extends HttpServlet {
+@WebServlet(name = "AddComment", urlPatterns = {"/AddComment"})
+public class AddComment extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,9 +36,18 @@ public class HelloServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            request.getRequestDispatcher("ShowComments.jsp").forward(request, response);
+        try (PrintWriter out = response.getWriter()) 
+        {
+                List<Comment> myList = (ArrayList<Comment>) request.getSession().getAttribute("comments");
+                
+                String comment = (String)request.getParameter("comment");
+                String username = (String)request.getSession().getAttribute("username");
+                myList.add(new Comment(username, comment));
+                
+                Serializable serial = (Serializable) myList;
+                FileToucher.save(serial, System.getProperty("saveFile"));
+                
+                response.sendRedirect("ShowComments");
         }
     }
 
