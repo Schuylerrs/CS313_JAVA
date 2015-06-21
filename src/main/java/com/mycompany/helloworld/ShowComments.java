@@ -56,6 +56,7 @@ public class ShowComments extends HttpServlet {
                 if (newname == null)
                 {
                     request.getRequestDispatcher("Login.jsp").forward(request, response);
+                    return;
                 }
                 else
                 {
